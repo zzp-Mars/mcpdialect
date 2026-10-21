@@ -1,0 +1,46 @@
+name: mcpdialect
+description: Check MCP tool schemas against model-provider dialects (Gemini, OpenAI strict, Anthropic).
+branding:
+  icon: check-square
+  color: blue
+inputs:
+  tools:
+    description: Path to a tools.json snapshot (a tools/list response, {"tools":[...]}, or a list).
+    required: false
+    default: ""
+  cmd:
+    description: Command that starts the MCP server over stdio (alternative to `tools`).
+    required: false
+    default: ""
+  profile:
+    description: Comma-separated profile ids, or "all".
+    required: false
+    default: gemini,anthropic,mcp
+  fail-on:
+    description: Lowest severity that fails the step (breaks, fixable, warn, never).
+    required: false
+    default: fixable
+  format:
+    description: Output format (text, json, sarif, github).
+    required: false
+    default: github
+runs:
+  using: composite
+  steps:
+    - name: Install mcpdialect from this action's checkout
+      shell: bash
+      run: python -m pip install --quiet "${GITHUB_ACTION_PATH}[live]"
+    - name: Check
+      shell: bash
+      env:
+        MCPD_TOOLS: ${{ inputs.tools }}
+        MCPD_CMD: ${{ inputs.cmd }}
+        MCPD_PROFILE: ${{ inputs.profile }}
+        MCPD_FAIL_ON: ${{ inputs.fail-on }}
+        MCPD_FORMAT: ${{ inputs.format }}
+      run: |
+        if [ -n "$MCPD_CMD" ]; then
+          mcpdialect check --cmd "$MCPD_CMD" -p "$MCPD_PROFILE" --fail-on "$MCPD_FAIL_ON" -f "$MCPD_FORMAT"
+        else
+          mcpdialect check "$MCPD_TOOLS" -p "$MCPD_PROFILE" --fail-on "$MCPD_FAIL_ON" -f "$MCPD_FORMAT"
+        fi

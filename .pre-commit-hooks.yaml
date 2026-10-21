@@ -1,0 +1,7 @@
+- id: mcpdialect
+  name: mcpdialect (MCP tool schema portability)
+  description: Check committed tools.json snapshots against provider dialects.
+  entry: mcpdialect check
+  language: python
+  files: (^|/)tools(\.[\w-]+)?\.json$
+  args: ["-p", "gemini,anthropic,mcp"]
