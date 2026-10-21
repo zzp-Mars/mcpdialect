@@ -1,0 +1,28 @@
+{
+  "tools": [
+    {
+      "name": "get_weather",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "city": {
+            "type": "string",
+            "description": "City name"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "c",
+              "f"
+            ]
+          }
+        },
+        "required": [
+          "city",
+          "unit"
+        ],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

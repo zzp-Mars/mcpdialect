@@ -1,0 +1,35 @@
+{
+  "_source": "Schema quoted in https://github.com/langchain-ai/langchain/issues/39271",
+  "tools": [
+    {
+      "name": "notion_create_attachment",
+      "inputSchema": {
+        "type": "object",
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "content"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "source_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "source_url"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "id": "anthropic",
+  "title": "Anthropic Messages API tools (input_schema)",
+  "applies_to": "tools[].input_schema without strict mode",
+  "verified_on": "2026-10-21",
+  "rules": [
+    {
+      "id": "ANT001",
+      "title": "Tool name must match ^[a-zA-Z0-9_-]{1,128}$",
+      "check": "tool_name_pattern",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools",
+      "verified_on": "2026-10-21",
+      "rationale": "The tool name must match the regex ^[a-zA-Z0-9_-]{1,128}$.",
+      "params": {
+        "pattern": "^[a-zA-Z0-9_-]{1,128}$"
+      }
+    },
+    {
+      "id": "ANT002",
+      "title": "No oneOf/allOf/anyOf at the top level of input_schema",
+      "check": "root_combinator",
+      "severity": "breaks",
+      "status": "unverified",
+      "source": "https://github.com/anthropics/claude-code/issues/4886",
+      "verified_on": "2026-10-21",
+      "rationale": "The API returns 400 'input_schema does not support oneOf, allOf, or anyOf at the top level'. This is not stated in Anthropic's docs; the source is the API error text reproduced in public issues, so the rule is unverified. The rewrite drops the top-level combinator, which loosens validation.",
+      "params": {
+        "keywords": [
+          "oneOf",
+          "allOf",
+          "anyOf"
+        ]
+      },
+      "fix": "strip_keywords",
+      "evidence": [
+        "https://github.com/anthropics/claude-code/issues/45106",
+        "https://github.com/langchain-ai/langchain/issues/39271"
+      ]
+    }
+  ]
+}

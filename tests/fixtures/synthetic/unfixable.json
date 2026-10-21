@@ -1,0 +1,50 @@
+{
+  "tools": [
+    {
+      "name": "bad name with spaces",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "integer",
+            "enum": [
+              1,
+              2,
+              3
+            ]
+          },
+          "cfg": {
+            "$ref": "https://example.com/schemas/cfg.json"
+          }
+        }
+      }
+    },
+    {
+      "name": "tree",
+      "inputSchema": {
+        "type": "object",
+        "$defs": {
+          "Node": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "string"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/Node"
+                }
+              }
+            }
+          }
+        },
+        "properties": {
+          "root": {
+            "$ref": "#/$defs/Node"
+          }
+        }
+      }
+    }
+  ]
+}

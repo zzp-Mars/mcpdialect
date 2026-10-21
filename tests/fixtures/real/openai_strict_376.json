@@ -1,0 +1,33 @@
+{
+  "_source": "Pattern from https://github.com/github/github-mcp-server/issues/376 (objects without additionalProperties: false)",
+  "tools": [
+    {
+      "name": "create_issue",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string"
+          },
+          "repo": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "title"
+        ]
+      }
+    }
+  ]
+}

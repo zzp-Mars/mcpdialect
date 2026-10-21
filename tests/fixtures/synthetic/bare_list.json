@@ -1,0 +1,8 @@
+[
+  {
+    "name": "t",
+    "inputSchema": {
+      "type": "object"
+    }
+  }
+]

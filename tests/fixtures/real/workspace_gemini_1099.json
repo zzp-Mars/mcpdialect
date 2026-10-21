@@ -1,0 +1,79 @@
+{
+  "_source": "Shapes quoted in https://github.com/taylorwilsdon/google_workspace_mcp/issues/1099 (minimized)",
+  "tools": [
+    {
+      "name": "search_gmail_messages",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string"
+          },
+          "page_token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Token for retrieving the next page of results."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    },
+    {
+      "name": "batch_update_doc",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "operations": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "insert_text"
+                    },
+                    "text": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "text"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "delete_text"
+                    },
+                    "start": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "start"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "operations"
+        ]
+      }
+    }
+  ]
+}

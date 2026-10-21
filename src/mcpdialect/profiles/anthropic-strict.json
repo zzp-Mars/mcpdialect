@@ -1,0 +1,142 @@
+{
+  "id": "anthropic-strict",
+  "title": "Anthropic strict tool use (strict: true)",
+  "applies_to": "tools[].input_schema with strict: true, and output_config.format JSON schemas",
+  "verified_on": "2026-10-21",
+  "rules": [
+    {
+      "id": "ANS001",
+      "title": "Objects must set additionalProperties: false",
+      "check": "additional_properties_not_false",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "additionalProperties must be set to false for objects.",
+      "fix": "set_additional_properties_false"
+    },
+    {
+      "id": "ANS002",
+      "title": "Numerical constraints are not supported",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "Numerical constraints (such as minimum, maximum, multipleOf) are not supported. Anthropic's own SDK helpers move them into the description, which is what the rewrite does.",
+      "params": {
+        "keywords": [
+          "minimum",
+          "maximum",
+          "multipleOf"
+        ]
+      },
+      "fix": "strip_keywords"
+    },
+    {
+      "id": "ANS003",
+      "title": "String length constraints are not supported",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "String constraints (minLength, maxLength) are not supported.",
+      "params": {
+        "keywords": [
+          "minLength",
+          "maxLength"
+        ]
+      },
+      "fix": "strip_keywords"
+    },
+    {
+      "id": "ANS004",
+      "title": "Array constraints beyond minItems 0 or 1",
+      "check": "min_items_gt",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "Array minItems supports only 0 and 1; other array constraints are not supported.",
+      "params": {
+        "max": 1
+      },
+      "fix": "strip_min_items"
+    },
+    {
+      "id": "ANS005",
+      "title": "Recursive schemas are not supported",
+      "check": "recursive_ref",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "Recursive schemas are not supported."
+    },
+    {
+      "id": "ANS006",
+      "title": "External $ref is not supported",
+      "check": "remote_ref",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "External $ref (for example 'http://...') is not supported."
+    },
+    {
+      "id": "ANS007",
+      "title": "allOf with $ref is not supported",
+      "check": "allof_with_ref",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "anyOf and allOf are supported, but allOf with $ref is not.",
+      "fix": "inline_refs"
+    },
+    {
+      "id": "ANS008",
+      "title": "enum values must be scalars",
+      "check": "enum_value_types",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "enum supports strings, numbers, bools, or nulls only - no complex types.",
+      "params": {
+        "allowed": [
+          "string",
+          "number",
+          "boolean",
+          "null"
+        ]
+      }
+    },
+    {
+      "id": "ANS009",
+      "title": "String format outside the supported list",
+      "check": "format_allowlist",
+      "severity": "warn",
+      "status": "verified",
+      "source": "https://platform.claude.com/docs/en/build-with-claude/structured-outputs#json-schema-limitations",
+      "verified_on": "2026-10-21",
+      "rationale": "Supported formats: date-time, time, date, duration, email, hostname, uri, ipv4, ipv6, uuid.",
+      "params": {
+        "allowed": [
+          "date-time",
+          "time",
+          "date",
+          "duration",
+          "email",
+          "hostname",
+          "uri",
+          "ipv4",
+          "ipv6",
+          "uuid"
+        ]
+      },
+      "fix": "strip_format"
+    }
+  ]
+}

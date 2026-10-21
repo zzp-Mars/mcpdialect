@@ -1,0 +1,47 @@
+{
+  "_source": "Pattern from https://github.com/google-gemini/gemini-cli/issues/13326 ($defs/$ref in MCP inputSchema), minimized",
+  "tools": [
+    {
+      "name": "run_query",
+      "inputSchema": {
+        "type": "object",
+        "$defs": {
+          "Warehouse": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "size": {
+                "$ref": "#/$defs/Size"
+              }
+            },
+            "required": [
+              "name"
+            ]
+          },
+          "Size": {
+            "type": "string",
+            "enum": [
+              "XS",
+              "S",
+              "M",
+              "L"
+            ]
+          }
+        },
+        "properties": {
+          "sql": {
+            "type": "string"
+          },
+          "warehouse": {
+            "$ref": "#/$defs/Warehouse"
+          }
+        },
+        "required": [
+          "sql"
+        ]
+      }
+    }
+  ]
+}

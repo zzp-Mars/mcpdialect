@@ -1,0 +1,195 @@
+{
+  "id": "gemini",
+  "title": "Gemini API function declarations (`parameters`, OpenAPI 3.0 subset)",
+  "applies_to": "tools[].functionDeclarations[].parameters in generateContent requests; the shape most Gemini clients convert MCP inputSchema into",
+  "verified_on": "2026-10-21",
+  "rules": [
+    {
+      "id": "GEM001",
+      "title": "`type` must be a single value, not a list",
+      "check": "type_list",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Schema.type is a single Type enum. A list such as [\"string\",\"null\"] fails with 'Proto field is not repeating, cannot start list'. Nullability is the boolean `nullable` field.",
+      "fix": "type_list_to_nullable",
+      "evidence": [
+        "https://github.com/taylorwilsdon/google_workspace_mcp/issues/1099"
+      ]
+    },
+    {
+      "id": "GEM002",
+      "title": "anyOf/oneOf with a null branch (Optional[T])",
+      "check": "null_union",
+      "severity": "breaks",
+      "status": "unverified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "The documented way to express an optional value is `nullable: true`. The docs list `anyOf` and a NULL type, so the API itself may accept anyOf[T, null]; the reported 400s come from common client converters that turn it into a list-valued `type`. Marked unverified for that reason; the rewrite is lossless.",
+      "fix": "null_union_to_nullable",
+      "evidence": [
+        "https://github.com/taylorwilsdon/google_workspace_mcp/issues/1099"
+      ]
+    },
+    {
+      "id": "GEM003",
+      "title": "`const` is not a Schema field",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "The Schema object has no `const` field; use a one-value `enum`.",
+      "params": {
+        "keywords": [
+          "const"
+        ]
+      },
+      "fix": "const_to_enum",
+      "evidence": [
+        "https://github.com/taylorwilsdon/google_workspace_mcp/issues/1099"
+      ]
+    },
+    {
+      "id": "GEM004",
+      "title": "`$ref` / `$defs` / `definitions` are not Schema fields",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "The Schema object has no reference fields; local references must be inlined before sending.",
+      "params": {
+        "keywords": [
+          "$ref",
+          "$defs",
+          "definitions"
+        ]
+      },
+      "fix": "inline_refs",
+      "evidence": [
+        "https://github.com/google-gemini/gemini-cli/issues/13326"
+      ]
+    },
+    {
+      "id": "GEM005",
+      "title": "`oneOf` is not a Schema field",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Only `anyOf` is available. Rewriting oneOf to anyOf loosens validation (an instance matching several branches becomes valid).",
+      "params": {
+        "keywords": [
+          "oneOf"
+        ]
+      },
+      "fix": "oneof_to_anyof"
+    },
+    {
+      "id": "GEM006",
+      "title": "`allOf` is not a Schema field",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Only `anyOf` is available. allOf branches are merged into the parent when they do not conflict; otherwise allOf is dropped (loosens validation).",
+      "params": {
+        "keywords": [
+          "allOf"
+        ]
+      },
+      "fix": "merge_allof"
+    },
+    {
+      "id": "GEM007",
+      "title": "Keyword is not part of the Gemini Schema subset",
+      "check": "keyword_allowlist",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Gemini's Schema object accepts only: type, format, title, description, nullable, enum, maxItems, minItems, properties, required, minProperties, maxProperties, minLength, maxLength, pattern, example, anyOf, propertyOrdering, default, items, minimum, maximum. Unknown fields are rejected by the proto parser ('Unknown name ...').",
+      "params": {
+        "allowed": [
+          "type",
+          "format",
+          "title",
+          "description",
+          "nullable",
+          "enum",
+          "maxItems",
+          "minItems",
+          "properties",
+          "required",
+          "minProperties",
+          "maxProperties",
+          "minLength",
+          "maxLength",
+          "pattern",
+          "example",
+          "anyOf",
+          "propertyOrdering",
+          "default",
+          "items",
+          "minimum",
+          "maximum"
+        ],
+        "ignore": [
+          "const",
+          "$ref",
+          "$defs",
+          "definitions",
+          "oneOf",
+          "allOf"
+        ]
+      },
+      "fix": "strip_keywords"
+    },
+    {
+      "id": "GEM008",
+      "title": "`enum` values must be strings",
+      "check": "enum_value_types",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Schema.enum is documented as string[]; numeric or boolean enums cannot be represented.",
+      "params": {
+        "allowed": [
+          "string"
+        ]
+      }
+    },
+    {
+      "id": "GEM009",
+      "title": "Every schema needs a `type`",
+      "check": "type_missing",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "Schema.type is documented as Required. mcpdialect infers it from other keywords (properties -> object, items -> array, string enum -> string) when it can.",
+      "fix": "infer_type",
+      "evidence": [
+        "https://github.com/google-gemini/gemini-cli/issues/23382"
+      ]
+    },
+    {
+      "id": "GEM010",
+      "title": "Function name characters and length",
+      "check": "tool_name_pattern",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://ai.google.dev/api/generate-content#FunctionDeclaration",
+      "verified_on": "2026-10-21",
+      "rationale": "FunctionDeclaration.name must be a-z, A-Z, 0-9, or contain underscores, colons, dots, and dashes, with a maximum length of 128.",
+      "params": {
+        "pattern": "^[A-Za-z0-9_:.\\-]{1,128}$"
+      }
+    }
+  ]
+}

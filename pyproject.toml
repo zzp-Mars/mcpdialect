@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcpdialect"
+version = "0.1.0"
+description = "Lint and rewrite MCP tool schemas so they work on Gemini, OpenAI strict mode, and Anthropic."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+authors = [{ name = "zzp-Mars" }]
+keywords = ["mcp", "model-context-protocol", "json-schema", "gemini", "openai", "anthropic", "fastmcp", "lint"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: Quality Assurance",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+live = ["mcp>=1.10"]
+fastmcp = ["fastmcp>=2.9"]
+dev = ["pytest>=8", "hypothesis>=6.100", "jsonschema>=4.21", "ruff>=0.6", "mypy>=1.10"]
+
+[project.scripts]
+mcpdialect = "mcpdialect.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/zzp-Mars/mcpdialect"
+Issues = "https://github.com/zzp-Mars/mcpdialect/issues"
+Changelog = "https://github.com/zzp-Mars/mcpdialect/blob/main/CHANGELOG.md"
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "examples", "docs", "scripts", "README.md", "CHANGELOG.md", "CONTRIBUTING.md", "LICENSE", "pyproject.toml"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcpdialect"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "RUF"]
+ignore = ["S101"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S603", "S607", "S108"]
+"examples/**" = ["S603"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+files = ["src/mcpdialect"]
+
+[[tool.mypy.overrides]]
+module = ["fastmcp.*", "mcp.*", "anyio.*"]
+ignore_missing_imports = true
+
+[tool.ruff.lint.isort]
+known-first-party = ["mcpdialect"]
+known-local-folder = ["conftest"]

@@ -1,0 +1,141 @@
+{
+  "id": "openai-strict",
+  "title": "OpenAI Structured Outputs / function calling with strict: true",
+  "applies_to": "function tools sent with strict: true (Chat Completions and Responses API)",
+  "verified_on": "2026-10-21",
+  "rules": [
+    {
+      "id": "OAS001",
+      "title": "Root schema must be type object",
+      "check": "root_type",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "The root level of a schema must be an object.",
+      "fix": "add_root_type_object"
+    },
+    {
+      "id": "OAS002",
+      "title": "Root schema must not use anyOf",
+      "check": "root_combinator",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "The root level object of a schema must not use anyOf (for example a discriminated union).",
+      "params": {
+        "keywords": [
+          "anyOf"
+        ]
+      }
+    },
+    {
+      "id": "OAS003",
+      "title": "Objects must set additionalProperties: false",
+      "check": "additional_properties_not_false",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "additionalProperties: false must always be set in objects. Setting it narrows free-form objects (dict[str, Any]) to empty objects.",
+      "fix": "set_additional_properties_false"
+    },
+    {
+      "id": "OAS004",
+      "title": "All properties must be listed in required",
+      "check": "not_all_required",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "All fields must be required; optional fields are emulated with a union with null. The rewrite makes them required-and-nullable, so the server must treat null like an omitted argument.",
+      "fix": "require_all_nullable"
+    },
+    {
+      "id": "OAS005",
+      "title": "Unsupported composition keywords",
+      "check": "keyword_present",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "Not yet supported: allOf, not, dependentRequired, dependentSchemas, if, then, else.",
+      "params": {
+        "keywords": [
+          "allOf",
+          "not",
+          "dependentRequired",
+          "dependentSchemas",
+          "if",
+          "then",
+          "else"
+        ]
+      },
+      "fix": "strip_keywords"
+    },
+    {
+      "id": "OAS006",
+      "title": "String format outside the documented list",
+      "check": "format_allowlist",
+      "severity": "warn",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "Documented formats: date-time, time, date, duration, email, hostname, ipv4, ipv6, uuid.",
+      "params": {
+        "allowed": [
+          "date-time",
+          "time",
+          "date",
+          "duration",
+          "email",
+          "hostname",
+          "ipv4",
+          "ipv6",
+          "uuid"
+        ]
+      },
+      "fix": "strip_format"
+    },
+    {
+      "id": "OAS007",
+      "title": "At most 10 levels of object nesting",
+      "check": "max_object_depth",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "A schema may have up to 5000 object properties total, with up to 10 levels of nesting.",
+      "params": {
+        "max": 10
+      }
+    },
+    {
+      "id": "OAS008",
+      "title": "At most 5000 object properties in total",
+      "check": "max_total_properties",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "A schema may have up to 5000 object properties total.",
+      "params": {
+        "max": 5000
+      }
+    },
+    {
+      "id": "OAS009",
+      "title": "At most 1000 enum values in total",
+      "check": "max_enum_values",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://developers.openai.com/api/docs/guides/structured-outputs#supported-schemas",
+      "verified_on": "2026-10-21",
+      "rationale": "A schema may have up to 1000 enum values across all enum properties.",
+      "params": {
+        "max": 1000
+      }
+    }
+  ]
+}

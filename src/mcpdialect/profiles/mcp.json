@@ -1,0 +1,31 @@
+{
+  "id": "mcp",
+  "title": "MCP specification (2025-11-25) tool definition",
+  "applies_to": "tools/list Tool objects, independent of any model provider",
+  "verified_on": "2026-10-21",
+  "rules": [
+    {
+      "id": "MCP001",
+      "title": "inputSchema must be a JSON Schema object",
+      "check": "schema_not_object",
+      "severity": "breaks",
+      "status": "verified",
+      "source": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools",
+      "verified_on": "2026-10-21",
+      "rationale": "The spec says inputSchema MUST be a valid JSON Schema object (not null)."
+    },
+    {
+      "id": "MCP002",
+      "title": "Tool name should be 1-128 characters without spaces or commas",
+      "check": "tool_name_pattern",
+      "severity": "warn",
+      "status": "verified",
+      "source": "https://modelcontextprotocol.io/specification/2025-11-25/server/tools",
+      "verified_on": "2026-10-21",
+      "rationale": "Tool names SHOULD be between 1 and 128 characters and SHOULD NOT contain spaces, commas, or other special characters.",
+      "params": {
+        "pattern": "^[^\\s,]{1,128}$"
+      }
+    }
+  ]
+}

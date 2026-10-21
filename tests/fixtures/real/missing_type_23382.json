@@ -1,0 +1,22 @@
+{
+  "_source": "Pattern from https://github.com/google-gemini/gemini-cli/issues/23382 (inputSchema without type: object)",
+  "tools": [
+    {
+      "name": "ping",
+      "inputSchema": {}
+    },
+    {
+      "name": "echo",
+      "inputSchema": {
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    }
+  ]
+}
