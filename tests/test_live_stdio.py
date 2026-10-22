@@ -37,4 +37,6 @@ def test_stdio_check_portable_server():
 
 def test_stdio_bad_command_exits_nonzero():
     r = run("check", "--cmd", f'"{sys.executable}" -c "import sys; sys.exit(3)"', "--timeout", "10")
-    assert r.returncode != 0
+    assert r.returncode == 2, r.stderr
+    assert "mcpdialect: error: could not list tools" in r.stderr
+    assert "Traceback" not in r.stderr

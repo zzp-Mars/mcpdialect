@@ -82,6 +82,33 @@ async def _list_all(session: Any) -> list[dict[str, Any]]:
     return normalize_tools(tools)
 
 
+def _root_message(exc: BaseException) -> str:
+    """Unwrap anyio/asyncio exception groups to the first real error message."""
+    while True:
+        inner = getattr(exc, "exceptions", None)
+        if not inner:
+            break
+        exc = inner[0]
+    return str(exc) or type(exc).__name__
+
+
+def _run_session(run: Any, timeout: float, source: str) -> list[dict[str, Any]]:
+    import anyio
+
+    try:
+        result: list[dict[str, Any]] = anyio.run(run)
+    except TimeoutError as exc:
+        raise LoadError(f"server did not answer tools/list within {timeout:g}s") from exc
+    except LoadError:
+        raise
+    except Exception as exc:
+        raise LoadError(
+            f"could not list tools from {source}: {_root_message(exc)} "
+            "(the server may have exited early; run it by hand to see its error)"
+        ) from exc
+    return result
+
+
 def load_tools_stdio(command: str, *, cwd: str | None = None, timeout: float = 30.0) -> list[dict[str, Any]]:
     """Start ``command`` as an MCP stdio server and return its tools/list."""
     _require_mcp()
@@ -101,10 +128,7 @@ def load_tools_stdio(command: str, *, cwd: str | None = None, timeout: float = 3
                 async with ClientSession(read, write) as session:
                     return await _list_all(session)
 
-    try:
-        return anyio.run(run)
-    except TimeoutError as exc:
-        raise LoadError(f"server did not answer tools/list within {timeout:g}s") from exc
+    return _run_session(run, timeout, f"--cmd {command!r}")
 
 
 def load_tools_http(url: str, *, timeout: float = 30.0) -> list[dict[str, Any]]:
@@ -121,7 +145,4 @@ def load_tools_http(url: str, *, timeout: float = 30.0) -> list[dict[str, Any]]:
                 async with ClientSession(read, write) as session:
                     return await _list_all(session)
 
-    try:
-        return anyio.run(run)
-    except TimeoutError as exc:
-        raise LoadError(f"server did not answer tools/list within {timeout:g}s") from exc
+    return _run_session(run, timeout, f"--url {url}")
